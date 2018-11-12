@@ -49,6 +49,7 @@ class GameScene extends Phaser.Scene {
         this.load.image('deathhp', '../../assets/images/Health Bar_Empty.png')
         this.load.audio('shoot', '../../assets/sound/435417__v-ktor__shoot02.wav')
         this.load.audio('dead', '../../assets/sound/dead.wav')
+        this.load.image('long_bg', '../../assets/images/Background_long.jpg')
         
 
     }
@@ -62,8 +63,10 @@ class GameScene extends Phaser.Scene {
         y = height * 0.5;
 
         bg = this.add.image(x, y, "bg");
+        this.tileSprite = this.add.tileSprite(x,y,800,600,'long_bg')
         profileDead = this.add.image(50, 50, "profileDead").setDisplaySize(80, 80)
         profile = this.add.image(50, 50, "profile").setDisplaySize(80, 80)
+
 
         deathhp = this.add.image(300, 35, 'deathhp').setDisplaySize(400, 35)
         hp = this.add.image(300, 35, 'hp').setDisplaySize(400, 35)
@@ -213,7 +216,7 @@ class GameScene extends Phaser.Scene {
         
         
         // Physic
-                // this.physics.add.collider(player, borders);
+                this.physics.add.collider(player, borders);
                 this.physics.add.collider(player, enemy,crashEnemy)
                 this.physics.add.collider(bullets, enemy,attackEnemy)
                 
@@ -285,6 +288,7 @@ class GameScene extends Phaser.Scene {
                 }
                 scoreText.setText('Score: ' + score )
             }
+            this.tileSprite.tilePositionX -= 2
             profile.setAlpha((gameOver == true) ? 0 : 1);
             hp.setAlpha((gameOver == true) ? 0 : 1);
             // profileDead.setAlpha((gameOver == false) ? 1 : 0);
@@ -313,6 +317,7 @@ let score = 0;
 let frames;
 let s;
 let enemy;
+// let tileSprite;
 let profile;
 let profileDead;
 let hp;
@@ -326,6 +331,9 @@ let i;
 
 
 // Main Function
+function crashBorder(player, border){
+
+}
 function crashEnemy(player, enemy) {
     console.log('c1');
     enemy.disableBody(true, true)
