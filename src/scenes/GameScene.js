@@ -42,7 +42,14 @@ class GameScene extends Phaser.Scene {
             }
         );
         this.load.audio("bgm", "../../assets/sound/bgm.mp3")
-        this.load.image('bullet', '../../assets/images/Attack.png');
+        this.load.image('bullet', '../../assets/images/Spear.png');
+        this.load.image('profile', '../../assets/images/Icon Alive.png')
+        this.load.image('profileDead', '../../assets/images/Icon Dead.png')
+        this.load.image('hp', '../../assets/images/Health Bar.png')
+        this.load.image('deathhp', '../../assets/images/Health Bar_Empty.png')
+        this.load.audio('shoot', '../../assets/sound/435417__v-ktor__shoot02.wav')
+        this.load.audio('dead', '../../assets/sound/dead.wav')
+        
 
     }
 
@@ -54,35 +61,41 @@ class GameScene extends Phaser.Scene {
         x = width * 0.5;
         y = height * 0.5;
 
-        this.add.image(x, y, "bg");
+        bg = this.add.image(x, y, "bg");
+        profileDead = this.add.image(50, 50, "profileDead").setDisplaySize(80, 80)
+        profile = this.add.image(50, 50, "profile").setDisplaySize(80, 80)
+
+        deathhp = this.add.image(300, 35, 'deathhp').setDisplaySize(400, 35)
+        hp = this.add.image(300, 35, 'hp').setDisplaySize(400, 35)
+
+        Phaser.Display.Align.In.Center(bg ,this.add.zone(400, 300, 800, 600))
+        // Phaser.Display.Align.In.TopLeft(profile, bg)
+        // Phaser.Display.Align.In.TopLeft(profileDead, bg)
 
 // Border
-        borders = this.physics.add.staticGroup();
-        borders
-            .create(0, 400, "border-side")
-            .setScale(2)
-            .refreshBody();
-        borders
-            .create(805, 400, "border-side")
-            .setScale(2)
-            .refreshBody();
+        // borders = this.physics.add.staticGroup();
+        // borders
+        //     .create(0, 400, "border-side")
+        //     .setScale(2)
+        //     .refreshBody();
+        // borders
+        //     .create(805, 400, "border-side")
+        //     .setScale(2)
+        //     .refreshBody();
 
-        borders
-            .create(400, 0, "border")
-            .setScale(2)
-            .refreshBody();
-        borders
-            .create(400, 600, "border")
-            .setScale(2)
-            .refreshBody();
+        // borders
+        //     .create(400, 0, "border")
+        //     .setScale(2)
+        //     .refreshBody();
+        // borders
+        //     .create(400, 600, "border")
+        //     .setScale(2)
+        //     .refreshBody();
 
 // 1Player
-        player = this.physics.add.sprite(100, 300, "player");
+        player = this.physics.add.sprite(100, 300, "player").setDisplaySize(80, 80);
         // player.setBounce(0.2);
         player.setCollideWorldBounds(true);
-        // just test crash border
-        // player.body.setGravityY(100);
-        // player.body.setGravityX(100);
 
     // Animation
         this.anims.create({
@@ -116,6 +129,11 @@ class GameScene extends Phaser.Scene {
             frameRate: 20
         });
         this.anims.create({
+            key: "hp dead",
+            frames: [{ key: "deathhp", frame: 0 }],
+            frameRate: 20
+        });
+        this.anims.create({
             key: "right",
             frames: this.anims.generateFrameNumbers("player", {
                 start: 5,
@@ -137,9 +155,13 @@ class GameScene extends Phaser.Scene {
         // Enemy
         enemy = this.physics.add.sprite(600, 300, "enemy");
         
+        
         // Sound
         bgm = this.sound.add("bgm", true);
         bgm.play({ loop: true });
+        shoot = this.sound.add("shoot", true)
+        dead = this.sound.add("dead", true)
+        
         // Fire
         console.log("fire")
         var Bullet = new Phaser.Class({
@@ -176,7 +198,7 @@ class GameScene extends Phaser.Scene {
             
         });
         
-        bullets = this.add.group({
+        bullets = this.physics.add.group({
             classType: Bullet,
             maxSize: 30,
             runChildUpdate: true
@@ -201,17 +223,21 @@ class GameScene extends Phaser.Scene {
         // this.physics.add.overlap(bullets, enemy, attackEnemy);
         // this.createLogs();
         // this.sys.install
+        scoreText = this.add.text(680, 16, 'Score : 0', {frontSize: '32px', fill: '#000'})
+        hpText = this.add.text(100, 60, 'Hp : 100', {frontSize: '32px', fill: '#000'})
     }
     
     update() {
         if (cursors.left.isDown || cursors.right.isDown || cursors.up.isDown || cursors.down.isDown){
             if (cursors.left.isDown){
                     player.setVelocityX(-300)
+                    // break;
                     // player.anims.play("left", true)
                     // console.log("left")
                 }
                 if (cursors.right.isDown){
                     player.setVelocityX(300)
+                    // enemy.setVelocityX(160)
                     // player.anims.play("right", true)
                 }
                 if(cursors.up.isDown){
@@ -230,7 +256,9 @@ class GameScene extends Phaser.Scene {
 
             if (Phaser.Input.Keyboard.JustDown(spacebar)){
                 var bullet = bullets.get();
+                shoot.play();
                 player.anims.play("fire", true)
+                console.log('fire')
                 if (bullet){
                 bullet.fire(player.x, player.y);
                 }
@@ -240,7 +268,26 @@ class GameScene extends Phaser.Scene {
             if (gameOver == true){
                 this.physics.pause();
                 player.anims.play("dead", true)
+                console.log("dead")
+                bgm.stop();
+                // dead.play();
+                // dead.play({ loop: true });
+                // dead.pause();
+                hpText.setText('Hp: ' + 0)
+                
+                // profile.set
+                
             }
+            if (enemyDead == true){
+                for(i=0;i++;i=1){
+
+                    score += 100;
+                }
+                scoreText.setText('Score: ' + score )
+            }
+            profile.setAlpha((gameOver == true) ? 0 : 1);
+            hp.setAlpha((gameOver == true) ? 0 : 1);
+            // profileDead.setAlpha((gameOver == false) ? 1 : 0);
     }
 }
 
@@ -260,36 +307,38 @@ let bgm;
 let gameOver = false;
 let spacebar;
 let bullets;
-let bulle;
+let bullet;
 let logs;
 let score = 0;
 let frames;
 let s;
 let enemy;
+let profile;
+let profileDead;
+let hp;
+let deathhp;
+let enemyDead = false;
+let scoreText;
+let hpText;
+let shoot;
+let dead;
+let i;
+
 
 // Main Function
 function crashEnemy(player, enemy) {
+    console.log('c1');
     enemy.disableBody(true, true)
+    console.log('c2');
     player.setTint(0xff0000)
     player.anims.play("dead", true)
     gameOver = true;
+    enemyDead = true;
+    dead.play();
 }
-function attackEnemy(bulle, enemy){
+function attackEnemy(enemy, bullet){
     score += 100;
+    scoreText.setText('Score: ' + score)
     enemy.disableBody(true, true)
-    // scoreText.setText('Score: ' + score)
 }
 
-function createLogs ()
-{
-    frames = this.textures.get('log').getFrameNames();
-
-    for (var i = 0; i < 5; i++)
-    {
-        x = Phaser.Math.Between(0, 800);
-        y = Phaser.Math.Between(0, 600);
-        s = Phaser.Math.FloatBetween(0.5, 1);
-
-        this.add.image(x, y, 'log', Phaser.Math.RND.pick(frames));
-    }
-}
