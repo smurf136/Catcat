@@ -1,26 +1,23 @@
 import 'phaser';
-import Test from './Test';
-import socket from './socket';
+import GameScene from './scenes/GameScene';
 
-const WIDTH = document.body.clientWidth;
-const HEIGHT = screen.height*0.9; 
-let config = {
+const config = {
+    // For more settings see <https://github.com/photonstorm/phaser/blob/master/src/boot/Config.js>
     type: Phaser.WEBGL,
+    pixelArt: true,
+    roundPixels: true,
     parent: 'content',
-    width: WIDTH,
-    height: HEIGHT,
-    scaleMode: 0, // Phaser.ScaleManager.EXACT_FIT,
+    width: 800,
+    height: 600,
     physics: {
         default: 'arcade',
-        arcade : {
+        arcade: {
             debug: false
         }
     },
     scene: [
-        Test
+        GameScene
     ]
 };
-socket.on('news', (data) => {
-    console.log(data)
- });
-let game = new Phaser.Game(config);
+
+const game = new Phaser.Game(config);
